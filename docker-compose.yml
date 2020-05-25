@@ -1,0 +1,37 @@
+version: '3.3'
+
+services:
+  buildworld:
+    build:
+      context: .
+    hostname: buildworld
+    #restart: always
+    image: innovanon/docker-buildworld:latest
+    container_name: docker-buildworld
+    #init: true
+    volumes:
+#    - ${PWD}/./dpkg.list:/usr/src/dpkg.list:ro
+#    - ${PWD}/./out:/usr/out:rw
+    - type: bind
+      #source: ${PWD}/./dpkg.list
+      source: ./dpkg.list
+      target: /dpkg.list
+      read_only: true
+    - type: bind
+      #source: ${PWD}/./out
+      source: ./out/
+      target: /usr/out/
+      read_only: false
+    - type: bind
+      source: ./priv.key
+      target: /root/priv.key
+      read_only: true
+    - type: bind
+      source: ./pub.key
+      target: /usr/out/pub.key
+      read_only: true
+    - type: bind
+      source: ./dpkg.log
+      target: /dpkg.log
+      read_only: false
+
