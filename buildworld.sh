@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 set -exu
 [[ $# -eq 0 ]]
 
@@ -16,7 +16,10 @@ unset LINES ARCH TUNE
 
 apt-fast update
 
+REPO=/usr/out/`dpkg --print-architecture`
 for k in `awk '$2 == "install" {print $1}' /dpkg.list` ; do (
+   if compgen -G "$REPO/$k-*.deb" > /dev/null ; then continue ; fi
+
    apt-fast build-dep $k &&
    apt-fast source $k &&
    #&& cd $k-*/
@@ -29,11 +32,12 @@ for k in `awk '$2 == "install" {print $1}' /dpkg.list` ; do (
 ) || echo $k >> /dpkg.log ;
   apt-fast autoremove     ;
   #for p in $k-*.deb ; do
-  # TODO test whether there are debs
-  for p in *.deb ; do
-    mv -v $p /usr/out/`dpkg --print-architecture`/
-  done || :
-
+  [[ -d $REPO ]] || mkdir -pv $REPO
+  if compgen -G "*.deb" > /dev/null ; then
+    for p in *.deb ; do
+      mv -v $p $REPO/
+    done
+  fi
   /repo.sh /usr/out
 
   #rm -rf $k-*
