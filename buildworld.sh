@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 set -exu
-[[ $# -eq 0 ]]
+(( $# == 0 ))
 
 gpg --import < /root/priv.key
 gpg --import < /usr/out/pub.key
