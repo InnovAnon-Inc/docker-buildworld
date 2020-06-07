@@ -33,7 +33,7 @@ for k in `awk '$2 == "install" {print $1}' /dpkg.list` ; do (
        --sign-key=53F31F9711F06089\!
    ) || ERR=1 ; done
 
-   return "$ERR"
+   exit "$ERR"
 ) || echo "$k" >> /dpkg.log ;
   apt-fast autoremove       ;
   #for p in $k-*.deb ; do
