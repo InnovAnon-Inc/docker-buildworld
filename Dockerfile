@@ -28,6 +28,7 @@ WORKDIR /usr/src
 COPY buildworld.sh /
 ADD https://raw.githubusercontent.com/InnovAnon-Inc/repo/master/repo.sh  /
 ADD https://raw.githubusercontent.com/InnovAnon-Inc/repo/master/march.sh /
-RUN chmod -v +x /repo.sh /march.sh
+ADD https://raw.githubusercontent.com/InnovAnon-Inc/repo/master/mtune.sh /
+RUN chmod -v +x /repo.sh /march.sh /mtune.sh
 ENTRYPOINT ["/buildworld.sh"]
 

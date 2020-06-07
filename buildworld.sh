@@ -1,41 +1,46 @@
 #! /usr/bin/env bash
 set -exu
-(( $# == 0 ))
+(( ! $# ))
 
 gpg --import < /root/priv.key
 gpg --import < /usr/out/pub.key
 #rm -v /root/priv.key /usr/out/pub.key
 
-#gcc -march=native -Q --help=target | awk '$1 == "-march=" {print $2}'
-LINES="`/march.sh`"
-ARCH=`echo $LINES | awk '{print $1}'`
-TUNE=`echo $LINES | awk '{print $2}'`
-export   CFLAGS="${CFLAGS+x}   -march=$ARCH -mtune=$TUNE"
-export CXXFLAGS="${CXXFLAGS+x} -march=$ARCH -mtune=$TUNE"
-unset LINES ARCH TUNE
+ARCH="`/march.sh -no-tune`"
+TUNE="`/mtune.sh`"
+export   CFLAGS="${CFLAGS:-}   -march=$ARCH -mtune=$TUNE"
+export CXXFLAGS="${CXXFLAGS:-} -march=$ARCH -mtune=$TUNE"
+unset ARCH TUNE
 
 apt-fast update
+apt-fast full-upgrade
 
-REPO=/usr/out/`dpkg --print-architecture`
+REPO="/usr/out/`dpkg --print-architecture`"
 for k in `awk '$2 == "install" {print $1}' /dpkg.list` ; do (
+   ERR=0
    if compgen -G "$REPO/$k-*.deb" > /dev/null ; then continue ; fi
 
-   apt-fast build-dep $k &&
-   apt-fast source $k &&
+   apt-fast build-dep "$k" &&
+   apt-fast source    "$k" &&
    #&& cd $k-*/
-   cd */ &&
-   dpkg-buildpackage         \
-     --root-command=fakeroot \
-     --compression-level=9   \
-     --compression=xz        \
-     --sign-key=53F31F9711F06089\!
-) || echo $k >> /dpkg.log ;
-  apt-fast autoremove     ;
+   for K in */ ; do (
+     cd "$K"
+     #  --root-command=fakeroot \
+     dpkg-buildpackage         \
+       --root-command="firejail --rlimit-as=$((1 << 30))" \
+       --compression-level=9   \
+       --compression=xz        \
+       --sign-key=53F31F9711F06089\!
+   ) || ERR=1 ; done
+
+   return "$ERR"
+) || echo "$k" >> /dpkg.log ;
+  apt-fast autoremove       ;
   #for p in $k-*.deb ; do
-  [[ -d $REPO ]] || mkdir -pv $REPO
+  [[ -d "$REPO" ]] || mkdir -pv "$REPO"
   if compgen -G "*.deb" > /dev/null ; then
     for p in *.deb ; do
-      mv -v $p $REPO/
+      mv -v "$p" "$REPO/"
     done
   fi
   /repo.sh /usr/out
