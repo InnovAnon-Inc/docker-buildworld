@@ -18,7 +18,7 @@ RUN for k in `find /etc/apt/sources.list /etc/apt/sources.list.d -type f` ; do \
     done \
  && apt-fast update
 
-RUN apt-fast install fakeroot
+RUN apt-fast install firejail
 
 RUN mkdir -pv /usr/src /usr/out
 #RUN mkdir -pv /usr/src
