@@ -18,7 +18,7 @@ apt-fast full-upgrade
 REPO="/usr/out/`dpkg --print-architecture`"
 for k in `awk '$2 == "install" {print $1}' /dpkg.list` ; do (
    ERR=0
-   if compgen -G "$REPO/$k-*.deb" > /dev/null ; then continue ; fi
+   if compgen -G "$REPO/$k-*.deb" > /dev/null ; then exit 0 ; fi
 
    apt-fast build-dep "$k" &&
    apt-fast source    "$k" &&
