@@ -27,7 +27,7 @@ for k in `awk '$2 == "install" {print $1}' /dpkg.list` ; do (
      cd "$K"
      #  --root-command=fakeroot \
      dpkg-buildpackage         \
-       --root-command="firejail --rlimit-as=$((1 << 30))" \
+       --root-command="firejail --rlimit-as=$((1 << 32))" \
        --compression-level=9   \
        --compression=xz        \
        --sign-key=53F31F9711F06089\!
