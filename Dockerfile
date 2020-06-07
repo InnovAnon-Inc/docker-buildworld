@@ -20,15 +20,17 @@ RUN for k in `find /etc/apt/sources.list /etc/apt/sources.list.d -type f` ; do \
 
 RUN apt-fast install firejail
 
-RUN mkdir -pv /usr/src /usr/out
+RUN mkdir -pv /usr/src /usr/out /usr/local/bin
 #RUN mkdir -pv /usr/src
 #VOLUME ["/usr/out"]
 #VOLUME ["/dpkg.list"]
 WORKDIR /usr/src
 COPY buildworld.sh /
 ADD https://raw.githubusercontent.com/InnovAnon-Inc/repo/master/repo.sh  /
-ADD https://raw.githubusercontent.com/InnovAnon-Inc/repo/master/march.sh /
-ADD https://raw.githubusercontent.com/InnovAnon-Inc/repo/master/mtune.sh /
-RUN chmod -v +x /repo.sh /march.sh /mtune.sh
+ADD https://raw.githubusercontent.com/InnovAnon-Inc/repo/master/march.sh /usr/local/bin/
+ADD https://raw.githubusercontent.com/InnovAnon-Inc/repo/master/mtune.sh /usr/local/bin/
+RUN mv /usr/local/bin/march.sh /usr/local/bin/march \
+ && mv /usr/local/bin/mtune.sh /usr/local/bin/mtune \
+ && chmod -v +x /repo.sh /usr/local/bin/march /usr/local/bin/mtune
 ENTRYPOINT ["/buildworld.sh"]
 
