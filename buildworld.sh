@@ -6,8 +6,8 @@ gpg --import < /root/priv.key
 gpg --import < /usr/out/pub.key
 #rm -v /root/priv.key /usr/out/pub.key
 
-ARCH="`/march.sh -no-tune`"
-TUNE="`/mtune.sh`"
+ARCH="`march -no-tune`"
+TUNE="`mtune`"
 export   CFLAGS="${CFLAGS:-}   -march=$ARCH -mtune=$TUNE"
 export CXXFLAGS="${CXXFLAGS:-} -march=$ARCH -mtune=$TUNE"
 unset ARCH TUNE
